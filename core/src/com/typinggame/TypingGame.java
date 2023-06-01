@@ -3,13 +3,13 @@ package com.typinggame;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 import java.io.File;
+import java.text.DecimalFormat;
 import java.util.Scanner;
 
 public class TypingGame extends ApplicationAdapter {
@@ -23,10 +23,15 @@ public class TypingGame extends ApplicationAdapter {
 	int textX,textY;
 	String character;
 	int progress;
-	
+	InputProc keyb;
+	float progressPercentage;
+	DecimalFormat df;
+
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
+		keyb=new InputProc();
+		df = new DecimalFormat("###.#");
 
 		//fonts
 		generator = new FreeTypeFontGenerator(Gdx.files.internal("font.ttf"));
@@ -67,18 +72,32 @@ public class TypingGame extends ApplicationAdapter {
 		fontTitle.draw(batch,"Typing Game", 40,680);
 		textX=40;
 		textY=580;
+		fontText.setColor(Color.LIME);
 		for(int i=0; i<x.length();i++){
 			if(x.charAt(i)=='/'){
 				textX=40;
 				textY-=50;
 			}
 			else{
+				if(progress>i){
+					fontText.setColor(Color.GREEN);
+				}
+				else{
+					fontText.setColor(Color.WHITE);
+				}
 				character=String.valueOf(x.charAt(i));
 				fontText.draw(batch,character,textX,textY);
 				textX+=15;
 			}
 		}
-		fontTitle.draw(batch,(progress/x.length())+"%",600,55);
+		progressPercentage=((float)progress/(float)x.length())*100;
+		if(progress==x.length()){
+			progressPercentage=100;
+		}
+		else if(keyb.output().equals(x.charAt(progress)) || x.charAt(progress)=='/'){
+			progress++;
+		}
+		fontTitle.draw(batch,df.format(progressPercentage)+"%",600,55);
 		batch.end();
 	}
 	
