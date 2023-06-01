@@ -3,6 +3,7 @@ package com.typinggame;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
@@ -26,12 +27,16 @@ public class TypingGame extends ApplicationAdapter {
 	InputProc keyb;
 	float progressPercentage;
 	DecimalFormat df;
+	Texture bg;
 
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
 		keyb=new InputProc();
 		df = new DecimalFormat("###.#");
+
+		//textures
+		bg=new Texture(Gdx.files.internal("bg.png"));
 
 		//fonts
 		generator = new FreeTypeFontGenerator(Gdx.files.internal("font.ttf"));
@@ -91,13 +96,15 @@ public class TypingGame extends ApplicationAdapter {
 			}
 		}
 		progressPercentage=((float)progress/(float)x.length())*100;
+		fontTitle.draw(batch,df.format(progressPercentage)+"%",600,55);
 		if(progress==x.length()){
 			progressPercentage=100;
+			scan.close();
+			batch.draw(bg,0,0);
 		}
 		else if(keyb.output().equals(x.charAt(progress)) || x.charAt(progress)=='/'){
 			progress++;
 		}
-		fontTitle.draw(batch,df.format(progressPercentage)+"%",600,55);
 		batch.end();
 	}
 	
@@ -107,5 +114,6 @@ public class TypingGame extends ApplicationAdapter {
 		generator.dispose();
 		fontTitle.dispose();
 		fontText.dispose();
+		bg.dispose();
 	}
 }
