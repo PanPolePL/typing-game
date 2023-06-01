@@ -28,11 +28,14 @@ public class TypingGame extends ApplicationAdapter {
 	float progressPercentage;
 	DecimalFormat df;
 	Texture bg;
+	Stopwatch stopwatch;
+	int wordCount;
 
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
 		keyb=new InputProc();
+		stopwatch=new Stopwatch();
 		df = new DecimalFormat("###.#");
 
 		//textures
@@ -55,6 +58,7 @@ public class TypingGame extends ApplicationAdapter {
 		textX=40;
 		textY=580;
 		progress=0;
+		wordCount=0;
 
 		//file
 		text = new File("text.txt");
@@ -68,6 +72,13 @@ public class TypingGame extends ApplicationAdapter {
 			x=x.concat(scan.nextLine());
 		}
 		System.out.println(x);
+
+		for(int i=0; i<x.length(); i++){
+			if(x.charAt(i)==' ' || x.charAt(i)=='/'){
+				wordCount++;
+			}
+		}
+		wordCount++;
 	}
 
 	@Override
@@ -101,9 +112,20 @@ public class TypingGame extends ApplicationAdapter {
 			progressPercentage=100;
 			scan.close();
 			batch.draw(bg,0,0);
+			if(!stopwatch.stopped){
+				stopwatch.stop();
+				stopwatch.stopped=true;
+				System.out.println(stopwatch.time);
+			}
+			fontTitle.draw(batch,"Time elapsed: "+stopwatch.time+" ms",450,500);
+			fontTitle.draw(batch,"Your WPM: "+df.format(((double)wordCount/stopwatch.time)*60000),450,400);
 		}
 		else if(keyb.output().equals(x.charAt(progress)) || x.charAt(progress)=='/'){
 			progress++;
+			if(!stopwatch.started){
+				stopwatch.start();
+				stopwatch.started=true;
+			}
 		}
 		batch.end();
 	}
